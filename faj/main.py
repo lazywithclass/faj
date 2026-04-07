@@ -137,6 +137,8 @@ class MainWindow(QMainWindow):
         act("Save", self.save, "Ctrl+S")
         act("Save As", self.save_as)
         tb.addSeparator()
+        act("Export CSV", self.export_csv)
+        tb.addSeparator()
         act("Add Row", self.add_row, "Ctrl+N")
         act("Delete Row(s)", self.del_rows, "Del")
         act("Add Column", self.add_column)
@@ -186,6 +188,19 @@ class MainWindow(QMainWindow):
         self.path = path
         self.save()
         self.setWindowTitle(f"Parquet Editor — {path}")
+
+    def export_csv(self):
+        path, _ = QFileDialog.getSaveFileName(
+            self, "Export CSV", "", "CSV (*.csv);;All files (*)"
+        )
+        if not path:
+            return
+        try:
+            self.model.dataframe().to_csv(path, index=False)
+        except Exception as e:
+            QMessageBox.critical(self, "Export failed", str(e))
+            return
+        self.status.showMessage(f"Exported to {path}", 3000)
 
     # --- edits
     def add_row(self):
